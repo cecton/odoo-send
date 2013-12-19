@@ -54,7 +54,7 @@ if not opt.port:
 if not opt.url:
     require("protocol host port")
     opt.url = "%s://%s:%s/xmlrpc" % (opt.protocol, opt.host, opt.port)
-    debug("url determinated is:", opt.port)
+    debug("url determinated is:", opt.url)
 
 if not opt.uid:
     require("url login password")
@@ -67,7 +67,7 @@ if not opt.uid:
         print "login success:", "%s@%s" % (opt.login, opt.db), \
             "(password: %s, uid=%s)" % (opt.password, opt.uid)
         sys.exit(0)
-    debug("login uid is:", opt.port)
+    debug("login uid is:", opt.uid)
 
 require("url db uid password model method")
 
