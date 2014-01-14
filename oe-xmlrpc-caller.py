@@ -16,13 +16,14 @@ def die(*messages):
     warn(*messages)
     sys.exit(1)
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--help', action='store_true')
 parser.add_argument('--url')
 parser.add_argument('--uid')
-parser.add_argument('--login', default='admin')
-parser.add_argument('--password', type=str, default=None)
-parser.add_argument('--host', default='localhost')
-parser.add_argument('--port', type=int)
+parser.add_argument('--login', '--username', '-U', default='admin')
+parser.add_argument('--password', '-W', type=str, default=None)
+parser.add_argument('--host', '-h', default='localhost')
+parser.add_argument('--port', '-p', type=int)
 parser.add_argument('--protocol', default='http')
 parser.add_argument('--debug', action='store_true')
 parser.add_argument('db', metavar='database')
@@ -30,6 +31,10 @@ parser.add_argument('model', nargs='?')
 parser.add_argument('method', nargs='?')
 parser.add_argument('args', nargs='*')
 opt = parser.parse_args()
+
+if opt.help:
+    parser.print_help()
+    sys.exit(0)
 
 def debug(*messages):
     if opt.debug:
