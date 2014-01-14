@@ -26,6 +26,8 @@ parser.add_argument('--host', '-h', default='localhost')
 parser.add_argument('--port', '-p', type=int)
 parser.add_argument('--protocol', default='http')
 parser.add_argument('--debug', action='store_true')
+parser.add_argument('--pipe', action='store_true')
+parser.add_argument('--pretty', action='store_true')
 parser.add_argument('db', metavar='database')
 parser.add_argument('model', nargs='?')
 parser.add_argument('method', nargs='?')
@@ -89,9 +91,9 @@ debug("arguments are:", pformat(opt.args))
 result = xmlrpclib.ServerProxy(opt.url + '/object')\
     .execute(opt.db, opt.uid, opt.password, opt.model, opt.method, *opt.args)
 
-if os.isatty(sys.stdout.fileno()):
-    debug("stdout is a tty")
+if (os.isatty(sys.stdout.fileno()) or opt.pretty) and not opt.pipe:
+    debug("pretty print")
     pprint(result)
 else:
-    debug("stdout is not a tty")
+    debug("pipable print")
     print result
