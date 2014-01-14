@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--url')
 parser.add_argument('--uid')
 parser.add_argument('--login', default='admin')
-parser.add_argument('--password', default='admin')
+parser.add_argument('--password', type=str, default=None)
 parser.add_argument('--host', default='localhost')
 parser.add_argument('--port', type=int)
 parser.add_argument('--protocol', default='http')
@@ -55,6 +55,9 @@ if not opt.url:
     require("protocol host port")
     opt.url = "%s://%s:%s/xmlrpc" % (opt.protocol, opt.host, opt.port)
     debug("url determinated is:", opt.url)
+
+if not opt.password:
+    opt.password = opt.login
 
 if not opt.uid:
     require("url login password")
