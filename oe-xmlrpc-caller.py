@@ -7,7 +7,7 @@ from pprint import pprint, pformat
 import argparse
 import xmlrpclib
 
-re_autoeval = re.compile(r"^(\d+|\[.*\]|\{.*\}|\".*\"|'.*')$")
+re_autoeval = re.compile(r"^(\d+|None|True|False|\[.*\]|\{.*\}|\".*\"|'.*')$")
 
 def warn(*messages):
     sys.stderr.write(" ".join(map(unicode, messages))+"\n")
@@ -46,7 +46,7 @@ def require(args):
     for arg in (args.split()
               if isinstance(args, basestring)
               else args):
-        if not getattr(opt, arg):
+        if getattr(opt, arg) is None:
             die("missing argument:", arg)
 
 if not opt.port:
