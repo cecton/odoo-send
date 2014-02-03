@@ -18,23 +18,34 @@ def die(*messages):
 
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument('--help', action='store_true')
-parser.add_argument('--url')
-parser.add_argument('--uid')
+parser.add_argument('--url',
+    help="Specify the base xmlrpc url to connect")
+parser.add_argument('--uid',
+    help="Specify the user id instead of a login "
+        "and skip the login procedure")
 parser.add_argument('--login', '--username', '-U', default='admin')
 parser.add_argument('--password', '-W', type=str, default=None)
 parser.add_argument('--host', '-h', default='localhost')
 parser.add_argument('--port', '-p', type=int)
-parser.add_argument('--protocol', default='http')
+parser.add_argument('--protocol', default='http',
+    help="Can be http or https, but use xmlrpc only")
 parser.add_argument('--debug', action='store_true')
-parser.add_argument('--pipe', action='store_true')
-parser.add_argument('--pretty', action='store_true')
-parser.add_argument('db', metavar='database')
+parser.add_argument('--pipe', action='store_true',
+    help="Print the result directly")
+parser.add_argument('--pretty', action='store_true',
+    help="Pretty print the result")
+parser.add_argument('--serial', action='store_true',
+    help="If the result is a list, print every element in a new line "
+        "(useful with search() to iterate on it)")
+parser.add_argument('db', metavar='database', nargs='?')
 parser.add_argument('model', nargs='?')
 parser.add_argument('method', nargs='?')
-parser.add_argument('args', nargs='*')
+parser.add_argument('args', nargs='*',
+    help="Beware that the following arguments will be Pyton evaluated: "
+        +re_autoeval.pattern)
 opt = parser.parse_args()
 
-if opt.help:
+if opt.help or not opt.db:
     parser.print_help()
     sys.exit(0)
 
@@ -91,7 +102,11 @@ debug("arguments are:", pformat(opt.args))
 result = xmlrpclib.ServerProxy(opt.url + '/object')\
     .execute(opt.db, opt.uid, opt.password, opt.model, opt.method, *opt.args)
 
-if (os.isatty(sys.stdout.fileno()) or opt.pretty) and not opt.pipe:
+if opt.serial:
+    debug("serial print")
+    for value in result:
+        print value
+elif (os.isatty(sys.stdout.fileno()) or opt.pretty) and not opt.pipe:
     debug("pretty print")
     pprint(result)
 else:
