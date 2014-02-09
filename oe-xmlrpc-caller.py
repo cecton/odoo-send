@@ -99,14 +99,23 @@ opt.args = [
 debug("call", opt.method, "on model", opt.model)
 debug("arguments are:", pformat(opt.args))
 
-result = xmlrpclib.ServerProxy(opt.url + '/object')\
-    .execute(opt.db, opt.uid, opt.password, opt.model, opt.method, *opt.args)
+try:
+    result = xmlrpclib.ServerProxy(opt.url + '/object')\
+        .execute(opt.db, opt.uid, opt.password,
+                 opt.model, opt.method, *opt.args)
+except xmlrpclib.Fault, fault:
+    die("XML RPC Fault Code: "+fault.faultCode+
+        "\nXML RPC Fault String: "+fault.faultString)
+except TypeError:
+    die("cannot marshal one of the arguments:\n"+
+        "\n".join(map(unicode, opt.args)))
 
-if opt.serial:
+if opt.serial and hasattr(value, '__iter__'):
     debug("serial print")
     for value in result:
         print value
-elif (os.isatty(sys.stdout.fileno()) or opt.pretty) and not opt.pipe:
+elif (os.isatty(sys.stdout.fileno()) or opt.pretty) \
+     and not opt.pipe and not opt.serial:
     debug("pretty print")
     pprint(result)
 else:
