@@ -104,8 +104,8 @@ try:
         .execute(opt.db, opt.uid, opt.password,
                  opt.model, opt.method, *opt.args)
 except xmlrpclib.Fault, fault:
-    die("XML RPC Fault Code: "+fault.faultCode+
-        "\nXML RPC Fault String: "+fault.faultString)
+    die("XML RPC Fault Code: %s\nXML RPC Fault String: %s"
+        % (fault.faultCode, fault.faultString))
 except TypeError:
     die("cannot marshal one of the arguments:\n"+
         "\n".join(map(unicode, opt.args)))
