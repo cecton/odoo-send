@@ -7,7 +7,8 @@ from pprint import pprint, pformat
 import argparse
 import xmlrpclib
 
-re_autoeval = re.compile(r"^(\d+|None|True|False|\[.*\]|\{.*\}|\".*\"|'.*')$")
+re_autoeval = re.compile(r"^(-?\d+|None|True|False|\[.*\]"
+                         r"|\{.*\}|\".*\"|'.*')$")
 
 def warn(*messages):
     sys.stderr.write(" ".join(map(unicode, messages))+"\n")
