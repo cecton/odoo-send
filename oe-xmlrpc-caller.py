@@ -78,7 +78,9 @@ if not opt.url:
 if not opt.password:
     opt.password = opt.login
 
-if not opt.uid:
+if opt.uid:
+    opt.uid = int(opt.uid)
+else:
     require("url login password")
     opt.uid = xmlrpclib.ServerProxy(opt.url + '/common')\
         .login(opt.db, opt.login, opt.password)
