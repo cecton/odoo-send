@@ -38,6 +38,8 @@ parser.add_argument('--pretty', action='store_true',
 parser.add_argument('--serial', action='store_true',
     help="If the result is a list, print every element in a new line "
         "(useful with search() to iterate on it)")
+parser.add_argument('--wrap', '-w',
+                    help="Wrap the results in a function f(x)")
 parser.add_argument('db', metavar='database', nargs='?')
 parser.add_argument('model', nargs='?')
 parser.add_argument('method', nargs='?')
@@ -60,6 +62,8 @@ def require(args):
               else args):
         if getattr(opt, arg) is None:
             die("missing argument:", arg)
+
+wrap_code = compile(opt.wrap or 'x', 'wrapper.py', mode='eval')
 
 if not opt.port:
     if opt.protocol == 'http':
@@ -116,11 +120,20 @@ except TypeError:
 if opt.serial and hasattr(value, '__iter__'):
     debug("serial print")
     for value in result:
-        print value
+        if not opt.wrap:
+            print value
+        else:
+            print eval(wrap_code, {}, {'x': value})
 elif (os.isatty(sys.stdout.fileno()) or opt.pretty) \
      and not opt.pipe and not opt.serial:
     debug("pretty print")
-    pprint(result)
+    if not opt.wrap:
+        pprint(result)
+    else:
+        pprint(eval(wrap_code, {}, {'x': result}))
 else:
     debug("pipable print")
-    print result
+    if not opt.wrap:
+        print result
+    else:
+        print eval(wrap_code, {}, {'x': result})
