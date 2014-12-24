@@ -117,7 +117,7 @@ except TypeError:
     die("cannot marshal one of the arguments:\n"+
         "\n".join(map(unicode, opt.args)))
 
-if opt.serial and hasattr(value, '__iter__'):
+if opt.serial and hasattr(result, '__iter__'):
     debug("serial print")
     for value in result:
         if not opt.wrap:
