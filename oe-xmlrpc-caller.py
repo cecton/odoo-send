@@ -40,6 +40,8 @@ parser.add_argument('--serial', action='store_true',
         "(useful with search() to iterate on it)")
 parser.add_argument('--wrap', '-w',
                     help="Wrap the results in a function f(x)")
+parser.add_argument('--insecure', '-k', action='store_true',
+                    help="Do not check SSL certificate")
 parser.add_argument('db', metavar='database', nargs='?')
 parser.add_argument('model', nargs='?')
 parser.add_argument('method', nargs='?')
@@ -82,11 +84,16 @@ if not opt.url:
 if not opt.password:
     opt.password = opt.login
 
+kwargs = {}
+if opt.insecure:
+    import ssl
+    kwargs['context'] = ssl._create_unverified_context()
+
 if opt.uid:
     opt.uid = int(opt.uid)
 else:
     require("url login password")
-    opt.uid = xmlrpclib.ServerProxy(opt.url + '/common')\
+    opt.uid = xmlrpclib.ServerProxy(opt.url + '/common', **kwargs)\
         .login(opt.db, opt.login, opt.password)
     if not opt.uid:
         die("login failed:", "%s@%s" % (opt.login, opt.db),
@@ -107,7 +114,7 @@ debug("call", opt.method, "on model", opt.model)
 debug("arguments are:", pformat(opt.args))
 
 try:
-    result = xmlrpclib.ServerProxy(opt.url + '/object')\
+    result = xmlrpclib.ServerProxy(opt.url + '/object', **kwargs)\
         .execute(opt.db, opt.uid, opt.password,
                  opt.model, opt.method, *opt.args)
 except xmlrpclib.Fault, fault:
